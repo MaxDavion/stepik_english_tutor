@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block container %}
+  <main class="container mt-5">
+    <div class="col-12 col-sm-10 col-lg-6 offset-lg-3 offset-sm-1">
+      <form method="POST" class="card mb-5">
+
+
+
+        <div class="card-body text-center pt-5">
+          {{ form.csrf_token }}
+          {{ form.title.label(class_="h3 card-title mt-4 mb-2") }}
+          {{ form.subtitle.label(class_="px-5") }}
+        </div>
+        <hr>
+        <div class="card-body mx-3">
+          <div class="row">
+            <div class="col">
+              <p>{{ form.goals.label}}</p>
+              {% for goal in form.goals %}
+                <div class="form-check">
+                  {{ goal(class_="form-check-input") }}
+                  {{ goal.label(class_="form-check-label") }}
+                </div>
+              {% endfor %}
+            </div>
+            <div class="col">
+              <p>{{ form.free_times.label}}</p>
+              {% for time in form.free_times %}
+                <div class="form-check">
+                  {{ time(class_="form-check-input") }}
+                  {{ time.label(class_="form-check-label") }}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <hr>
+        <div class="card-body mx-3">
+
+          {{ form.name.label(class_="mb-1 mt-2")}}
+          {{ form.name(class_="form-control")}}
+          {% for err in form.name.errors %}
+            <div class="text-danger font-italic">
+              <small> {{ err }} </small>
+            </div>
+          {% endfor %}
+
+          {{ form.phone.label(class_="mb-1 mt-2")}}
+          {{ form.phone(class_="form-control")}}
+          {% for err in form.phone.errors %}
+            <div class="text-danger font-italic">
+              <small> {{ err }} </small>
+            </div>
+          {% endfor %}
+
+          <input type="submit" class="btn btn-primary mt-4 mb-2" value="Найдите мне преподавателя">
+        </div>
+      </form>
+    </div>
+  </main>
+{% endblock %}
+
+
