@@ -1,13 +1,17 @@
 import random
 from flask import Flask, render_template, request
+from flask_wtf.csrf import CSRFProtect
 import prepare_script
 # Инициализировать начальное состояние базы данных
 prepare_script.create_db(rewrite_if_db_exists=False)
 import forms
 import db_manager
-
+import os
 
 app = Flask(__name__)
+
+SECRET_KEY = os.urandom(32)
+app.config['SECRET_KEY'] = SECRET_KEY
 
 
 @app.route('/')
@@ -81,5 +85,4 @@ def as_goal_title(goal):
 
 
 if __name__ == '__main__':
-    app.secret_key = 'my-super-secret-phrase-I-dont-tell-this-to-nobody'
     app.run()

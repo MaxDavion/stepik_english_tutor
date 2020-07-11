@@ -4,11 +4,8 @@
   <main class="container mt-5">
     <div class="col-12 col-sm-10 col-lg-6 offset-lg-3 offset-sm-1">
       <form method="POST" class="card mb-5">
-
-
-
+        {{ form.csrf_token }}
         <div class="card-body text-center pt-5">
-          {{ form.csrf_token }}
           {{ form.title.label(class_="h3 card-title mt-4 mb-2") }}
           {{ form.subtitle.label(class_="px-5") }}
         </div>
