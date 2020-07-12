@@ -1,12 +1,12 @@
+import os
 import random
 from flask import Flask, render_template, request
-from flask_wtf.csrf import CSRFProtect
 import prepare_script
 # Инициализировать начальное состояние базы данных
 prepare_script.create_db(rewrite_if_db_exists=False)
 import forms
 import db_manager
-import os
+
 
 app = Flask(__name__)
 
