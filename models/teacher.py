@@ -1,3 +1,4 @@
+import json
 from models import db, teachers_goals_association
 
 
@@ -10,5 +11,8 @@ class Teacher(db.Model):
     picture = db.Column(db.String, nullable=False)
     price = db.Column(db.Integer, nullable=False)
     goals = db.relationship('Goal', secondary=teachers_goals_association, back_populates='teachers')
-    free = db.Column(db.String, nullable=False)
+    _free = db.Column('free', db.String, nullable=False)
 
+    @property
+    def free_time_slots(self):
+        return json.loads(self._free)

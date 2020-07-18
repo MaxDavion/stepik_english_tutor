@@ -1,7 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, RadioField, SubmitField, HiddenField
 from wtforms.validators import Length
-import db_manager
 
 
 class RequestForm(FlaskForm):
@@ -10,7 +9,6 @@ class RequestForm(FlaskForm):
 
     goals = RadioField(
         'Какая цель занятий?',
-        choices=[(i['key'], i['name']) for i in db_manager.get_all_goals()],
         default="travel")
 
     free_times = RadioField('Сколько времени есть?', choices=[
@@ -23,6 +21,7 @@ class RequestForm(FlaskForm):
     name = StringField("Вас зовут", [Length(min=1, message="Имя должно содержать не менее одного символа")])
     phone = StringField("Ваш телефон", [Length(min=7, message="Номер телефона должен содержать не менее 7и символов")])
     submit = SubmitField('Найдите мне преподавателя')
+
 
 
 class BookingForm(FlaskForm):

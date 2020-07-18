@@ -3,10 +3,13 @@ import random
 from flask import Flask, render_template, request
 from flask_script import Manager
 import forms
-import db_manager
+# import db_manager
 from flask import Flask
 from flask_migrate import Migrate, MigrateCommand
 from models import db
+from models.teacher import Teacher
+from models.goal import Goal
+from sqlalchemy.sql.expression import func
 
 
 app = Flask(__name__)
@@ -16,6 +19,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+db.reflect(app=app)
 manager = Manager(app)
 migrate = Migrate(app, db)
 # db.create_all()
@@ -24,12 +28,10 @@ manager.add_command('db', MigrateCommand)
 
 @app.route('/')
 def main():
-    _teachers_list = db_manager.get_all_teachers()
-    random.shuffle(_teachers_list)
     return render_template(
         "index.html",
-        goals=db_manager.get_all_goals(),
-        teachers=_teachers_list[:6]
+        goals=Goal.query.all(),
+        teachers=Teacher.query.order_by(func.random()).limit(6).all()
     )
 
 
@@ -37,8 +39,8 @@ def main():
 def goals(goal):
     return render_template(
         "goal.html",
-        goal=db_manager.get_all_goals(filter_by_key=goal)[0],
-        teachers=db_manager.get_all_teachers(filter_by_goal=goal)
+        goal=Goal.query.filter(Goal.key == goal).first(),
+        teachers=Teacher.query.filter(Teacher.goals.any(key=goal)).all()
     )
 
 
@@ -46,13 +48,14 @@ def goals(goal):
 def profile(teacher_id):
     return render_template(
         "profile.html",
-        teacher=db_manager.get_all_teachers(filter_by_id=teacher_id)[0]
+        teacher=Teacher.query.get_or_404(teacher_id)
     )
 
 
 @app.route('/request/', methods=['POST', 'GET'])
 def teacher_request():
     form = forms.RequestForm()
+    form.goals.choices = [(i.key, i.name) for i in Goal.query.all()]
     if request.method == 'POST':
         if form.validate_on_submit():
             db_manager.insert_request(**form.data)
@@ -86,10 +89,10 @@ def as_rus_weekday(day):
             'sun': 'Воскресенье'}[day]
 
 
-@app.template_filter('as_goal_title')
-def as_goal_title(goal):
-    """ Вернуть название переданной цели """
-    return db_manager.get_all_goals(filter_by_key=goal)[0]['name']
+# @app.template_filter('as_goal_title')
+# def as_goal_title(goal):
+#     """ Вернуть название переданной цели """
+#     return db_manager.get_all_goals(filter_by_key=goal)[0]['name']
 
 
 if __name__ == '__main__':
