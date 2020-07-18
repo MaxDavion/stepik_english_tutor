@@ -1,17 +1,25 @@
 import os
 import random
 from flask import Flask, render_template, request
-import prepare_script
-# Инициализировать начальное состояние базы данных
-prepare_script.create_db(rewrite_if_db_exists=False)
+from flask_script import Manager
 import forms
 import db_manager
+from flask import Flask
+from flask_migrate import Migrate, MigrateCommand
+from models import db
 
 
 app = Flask(__name__)
-
 SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.init_app(app)
+manager = Manager(app)
+migrate = Migrate(app, db)
+# db.create_all()
+manager.add_command('db', MigrateCommand)
 
 
 @app.route('/')
