@@ -1,4 +1,4 @@
-from models import db
+from models import db, teachers_goals_association
 
 
 class Teacher(db.Model):
@@ -9,6 +9,6 @@ class Teacher(db.Model):
     rating = db.Column(db.Integer, nullable=False)
     picture = db.Column(db.String, nullable=False)
     price = db.Column(db.Integer, nullable=False)
-    goals = db.Column(db.String, nullable=False)
+    goals = db.relationship('Goal', secondary=teachers_goals_association, back_populates='teachers')
     free = db.Column(db.String, nullable=False)
 

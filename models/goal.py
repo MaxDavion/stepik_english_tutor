@@ -1,4 +1,4 @@
-from models import db
+from models import db, teachers_goals_association
 
 
 class Goal(db.Model):
@@ -7,6 +7,8 @@ class Goal(db.Model):
     key = db.Column(db.String(50), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     icon = db.Column(db.String, nullable=False)
+
+    teachers = db.relationship('Teacher', secondary=teachers_goals_association, back_populates='goals')
 
 
 
