@@ -1,14 +1,14 @@
 import os
-import random
 from flask import Flask, render_template, request
 from flask_script import Manager
 import forms
-# import db_manager
+import db_manager
 from flask import Flask
 from flask_migrate import Migrate, MigrateCommand
 from models import db
 from models.teacher import Teacher
 from models.goal import Goal
+from models.request import Request
 from sqlalchemy.sql.expression import func
 
 
@@ -58,7 +58,18 @@ def teacher_request():
     form.goals.choices = [(i.key, i.name) for i in Goal.query.all()]
     if request.method == 'POST':
         if form.validate_on_submit():
-            db_manager.insert_request(**form.data)
+            form.goals.data = Goal.query.filter(Goal.key == form.data['goals']).first()
+            entry = Request(
+                name=form.data['name'],
+                phone=form.data['phone'],
+                free_times=form.data['free_times'],
+                # goal=Goal.query.filter(Goal.key == form.data['goals']).first(),
+                goal=form.data['goals']
+            )
+            db.session.add(entry)
+            db.session.commit()
+
+            # db_manager.insert_request(**form.data)
             return render_template('request_done.html', form=form)
 
     return render_template('request.html', form=form)
