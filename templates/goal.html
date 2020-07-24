@@ -6,7 +6,7 @@
 
       <div class="row">
       <div class="col-12 col-lg-10 offset-lg-1 m-auto">
-        {% for teacher in teachers | sort(attribute="rating", reverse=True) %}
+        {% for teacher in teachers %}
           {% include 'teacher_card.html' %}
         {% endfor %}
       </div>

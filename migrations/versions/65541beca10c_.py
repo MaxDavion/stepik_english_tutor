@@ -11,7 +11,7 @@ from models import db
 from models.teacher import Teacher
 from models.goal import Goal
 import json
-import db_manager
+from json_db import reader
 
 # revision identifiers, used by Alembic.
 revision = '65541beca10c'
@@ -48,7 +48,7 @@ def upgrade():
     # ### end Alembic commands ###
 
     goals = []
-    for goal in db_manager.get_all_goals():
+    for goal in reader.get_all_goals():
         goals.append(
             Goal(
                 key=goal['key'],
@@ -57,7 +57,7 @@ def upgrade():
             ))
 
     teachers = []
-    for teacher in db_manager.get_all_teachers():
+    for teacher in reader.get_all_teachers():
         teachers.append(
             Teacher(
                 id=teacher['id'],

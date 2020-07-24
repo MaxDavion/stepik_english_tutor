@@ -40,7 +40,7 @@ def goals(goal):
     return render_template(
         "goal.html",
         goal=Goal.query.filter(Goal.key == goal).first(),
-        teachers=Teacher.query.filter(Teacher.goals.any(key=goal)).all()
+        teachers=Teacher.query.filter(Teacher.goals.any(key=goal)).order_by(Teacher.rating.desc()).all()
     )
 
 
@@ -59,15 +59,7 @@ def teacher_request():
     if request.method == 'POST':
         if form.validate_on_submit():
             form.goals.data = Goal.query.filter(Goal.key == form.data['goals']).first()
-            entry = Request(
-                name=form.data['name'],
-                phone=form.data['phone'],
-                free_times=form.data['free_times'],
-                goal=form.data['goals']
-            )
-            db.session.add(entry)
-            db.session.commit()
-
+            Request.add(**form.data).commit()
             return render_template('request_done.html', form=form)
 
     return render_template('request.html', form=form)
@@ -78,16 +70,7 @@ def booking(teacher_id, weekday, time):
     form = forms.BookingForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-
-            entry = Booking(
-                phone=form.data['phone'],
-                time=form.data['time'],
-                weekday=form.data['weekday'],
-                teacher=Teacher.query.get(teacher_id)
-            )
-            db.session.add(entry)
-            db.session.commit()
-
+            Booking.add(teacher=Teacher.query.get(teacher_id), **form.data).commit()
             return render_template("booking_done.html", form=form)
 
     return render_template(
@@ -97,6 +80,11 @@ def booking(teacher_id, weekday, time):
         time=time,
         form=form
     )
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404_error.html'), 404
 
 
 @app.template_filter('as_rus_weekday')
