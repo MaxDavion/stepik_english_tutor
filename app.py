@@ -2,13 +2,13 @@ import os
 from flask import Flask, render_template, request
 from flask_script import Manager
 import forms
-import db_manager
 from flask import Flask
 from flask_migrate import Migrate, MigrateCommand
 from models import db
 from models.teacher import Teacher
 from models.goal import Goal
 from models.request import Request
+from models.booking import Booking
 from sqlalchemy.sql.expression import func
 
 
@@ -63,13 +63,11 @@ def teacher_request():
                 name=form.data['name'],
                 phone=form.data['phone'],
                 free_times=form.data['free_times'],
-                # goal=Goal.query.filter(Goal.key == form.data['goals']).first(),
                 goal=form.data['goals']
             )
             db.session.add(entry)
             db.session.commit()
 
-            # db_manager.insert_request(**form.data)
             return render_template('request_done.html', form=form)
 
     return render_template('request.html', form=form)
@@ -80,12 +78,21 @@ def booking(teacher_id, weekday, time):
     form = forms.BookingForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            db_manager.insert_booking(**form.data)
+
+            entry = Booking(
+                phone=form.data['phone'],
+                time=form.data['time'],
+                weekday=form.data['weekday'],
+                teacher=Teacher.query.get(teacher_id)
+            )
+            db.session.add(entry)
+            db.session.commit()
+
             return render_template("booking_done.html", form=form)
 
     return render_template(
         "booking.html",
-        teacher=db_manager.get_all_teachers(filter_by_id=teacher_id)[0],
+        teacher=Teacher.query.get(teacher_id),
         weekday=weekday,
         time=time,
         form=form
@@ -100,11 +107,5 @@ def as_rus_weekday(day):
             'sun': 'Воскресенье'}[day]
 
 
-# @app.template_filter('as_goal_title')
-# def as_goal_title(goal):
-#     """ Вернуть название переданной цели """
-#     return db_manager.get_all_goals(filter_by_key=goal)[0]['name']
-
-
 if __name__ == '__main__':
-    app.run()
+    app.run(port=5001)
